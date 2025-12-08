@@ -229,39 +229,25 @@ async function processVideo(file: File, params: ExtractionParams, totalDuration:
       },
     });
 
-    // ファイルをストリームで読み込んでdemuxerに渡す（大容量ファイル対応）
-    const CHUNK_SIZE = 4 * 1024 * 1024; // 4MB chunks
-    let offset = 0;
-
-    async function readChunks() {
-      try {
-        while (offset < file.size && !cancelled) {
-          const end = Math.min(offset + CHUNK_SIZE, file.size);
-          const blob = file.slice(offset, end);
-          const arrayBuffer = await blob.arrayBuffer();
-
-          if (cancelled) {
-            resolve();
-            return;
-          }
-
-          demuxer!.appendBuffer(arrayBuffer, offset);
-          offset = end;
-        }
-
-        if (!cancelled) {
-          demuxer!.flush();
-        }
-      } catch (error) {
-        if (!cancelled) {
-          const message = error instanceof Error ? error.message : 'Failed to read file';
-          postWorkerMessage({ type: 'error', message });
-          reject(new Error(message));
-        }
+    // ファイルを読み込んでdemuxerに渡す
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (cancelled) {
+        resolve();
+        return;
       }
-    }
 
-    readChunks();
+      const arrayBuffer = reader.result as ArrayBuffer;
+      demuxer!.appendBuffer(arrayBuffer, 0);
+      demuxer!.flush();
+    };
+    reader.onerror = () => {
+      if (!cancelled) {
+        postWorkerMessage({ type: 'error', message: 'Failed to read file' });
+        reject(new Error('Failed to read file'));
+      }
+    };
+    reader.readAsArrayBuffer(file);
   });
 }
 
