@@ -91,9 +91,9 @@ function App() {
     exportServiceRef.current.downloadSingle(slide);
   }, []);
 
-  const handleDownloadAll = useCallback(() => {
-    exportServiceRef.current.downloadAll(slides);
-  }, [slides]);
+  const handleDownloadSelected = useCallback((selectedSlides: ExtractedSlide[]) => {
+    exportServiceRef.current.downloadAll(selectedSlides);
+  }, []);
 
   const handleReset = useCallback(() => {
     processorRef.current?.cancel();
@@ -190,7 +190,7 @@ function App() {
             <SlideGallery
               slides={slides}
               onDownloadSingle={handleDownloadSingle}
-              onDownloadAll={handleDownloadAll}
+              onDownloadSelected={handleDownloadSelected}
             />
           </section>
         )}

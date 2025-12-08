@@ -298,7 +298,28 @@
   color: #333;
 }
 
-.download-all-button {
+.gallery-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.select-toggle-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.select-toggle-button:hover {
+  background: #5a6268;
+}
+
+.download-selected-button {
   padding: 10px 20px;
   font-size: 1rem;
   background: #17a2b8;
@@ -309,8 +330,13 @@
   transition: background 0.2s;
 }
 
-.download-all-button:hover {
+.download-selected-button:hover:not(:disabled) {
   background: #138496;
+}
+
+.download-selected-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
 .gallery-grid {
@@ -329,6 +355,28 @@
 
 .slide-card:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.slide-card-selected {
+  border-color: #17a2b8;
+  box-shadow: 0 0 0 2px #17a2b8;
+}
+
+.slide-checkbox-label {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.slide-checkbox {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  z-index: 1;
+  accent-color: #17a2b8;
 }
 
 .slide-thumbnail {

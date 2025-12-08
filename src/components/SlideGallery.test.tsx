@@ -5,7 +5,7 @@ import type { ExtractedSlide } from '../types';
 
 describe('SlideGallery', () => {
   const mockOnDownloadSingle = vi.fn();
-  const mockOnDownloadAll = vi.fn();
+  const mockOnDownloadSelected = vi.fn();
 
   const createMockSlide = (id: string, sequenceNumber: number, timestamp: number): ExtractedSlide => ({
     id,
@@ -25,7 +25,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={[]}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       expect(container.firstChild).toBeNull();
@@ -44,7 +44,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       expect(screen.getByTestId('slide-gallery')).toBeInTheDocument();
@@ -55,7 +55,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       expect(screen.getByText('検出されたスライド (3枚)')).toBeInTheDocument();
@@ -66,7 +66,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       const cards = screen.getAllByTestId('slide-card');
@@ -78,7 +78,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       expect(screen.getByText('#1')).toBeInTheDocument();
@@ -91,7 +91,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       expect(screen.getByText('0:00')).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
       const images = screen.getAllByRole('img');
@@ -121,30 +121,62 @@ describe('SlideGallery', () => {
       createMockSlide('slide-2', 2, 30),
     ];
 
-    it('すべてダウンロードボタンが表示される', () => {
+    it('選択をダウンロードボタンが表示される', () => {
       render(
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
-      expect(screen.getByTestId('download-all-button')).toBeInTheDocument();
-      expect(screen.getByText('すべてダウンロード (ZIP)')).toBeInTheDocument();
+      expect(screen.getByTestId('download-selected-button')).toBeInTheDocument();
+      expect(screen.getByText('選択をダウンロード (0枚)')).toBeInTheDocument();
     });
 
-    it('すべてダウンロードボタンをクリックするとonDownloadAllが呼ばれる', () => {
+    it('選択をダウンロードボタンは選択がない場合は無効', () => {
       render(
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
 
-      fireEvent.click(screen.getByTestId('download-all-button'));
+      expect(screen.getByTestId('download-selected-button')).toBeDisabled();
+    });
 
-      expect(mockOnDownloadAll).toHaveBeenCalledTimes(1);
+    it('全選択ボタンをクリックするとすべて選択される', () => {
+      render(
+        <SlideGallery
+          slides={mockSlides}
+          onDownloadSingle={mockOnDownloadSingle}
+          onDownloadSelected={mockOnDownloadSelected}
+        />
+      );
+
+      fireEvent.click(screen.getByTestId('select-toggle-button'));
+
+      expect(screen.getByText('選択をダウンロード (2枚)')).toBeInTheDocument();
+      expect(screen.getByText('全解除')).toBeInTheDocument();
+    });
+
+    it('スライドを選択してダウンロードするとonDownloadSelectedが選択されたスライドで呼ばれる', () => {
+      render(
+        <SlideGallery
+          slides={mockSlides}
+          onDownloadSingle={mockOnDownloadSingle}
+          onDownloadSelected={mockOnDownloadSelected}
+        />
+      );
+
+      // 1枚目を選択
+      fireEvent.click(screen.getByTestId('slide-checkbox-1'));
+
+      // ダウンロードボタンをクリック
+      fireEvent.click(screen.getByTestId('download-selected-button'));
+
+      expect(mockOnDownloadSelected).toHaveBeenCalledTimes(1);
+      expect(mockOnDownloadSelected).toHaveBeenCalledWith([mockSlides[0]]);
     });
 
     it('各スライドに個別ダウンロードボタンが表示される', () => {
@@ -152,7 +184,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
 
@@ -165,7 +197,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
 
@@ -180,7 +212,7 @@ describe('SlideGallery', () => {
         <SlideGallery
           slides={mockSlides}
           onDownloadSingle={mockOnDownloadSingle}
-          onDownloadAll={mockOnDownloadAll}
+          onDownloadSelected={mockOnDownloadSelected}
         />
       );
 
