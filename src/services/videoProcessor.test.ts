@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { VideoProcessor } from './videoProcessor';
-import type { ExtractionParams, ProgressState } from '../types';
+import type { ExtractionParams, ExtractedSlide, ProgressState } from '../types';
 
 describe('VideoProcessor', () => {
   let processor: VideoProcessor;
@@ -131,6 +131,51 @@ describe('VideoProcessor', () => {
       if (!result.success) {
         expect(result.error.type).toBe('EXTRACTION_FAILED');
       }
+    });
+  });
+
+  describe('onSlideDetected', () => {
+    it('スライド検出時にコールバックが呼び出されること', async () => {
+      const slideCallback = vi.fn() as (slide: ExtractedSlide) => void;
+
+      const result = await processor.processVideo(
+        mockVideo,
+        defaultParams,
+        progressCallback,
+        slideCallback
+      );
+
+      expect(result.success).toBe(true);
+      expect(slideCallback).toHaveBeenCalled();
+    });
+
+    it('最初のフレームで必ずコールバックが呼び出されること', async () => {
+      const slideCallback = vi.fn() as (slide: ExtractedSlide) => void;
+
+      await processor.processVideo(
+        mockVideo,
+        defaultParams,
+        progressCallback,
+        slideCallback
+      );
+
+      // 最初のフレームは必ず検出される
+      expect(slideCallback).toHaveBeenCalled();
+      const mockFn = slideCallback as unknown as ReturnType<typeof vi.fn>;
+      const firstCall = mockFn.mock.calls[0][0] as ExtractedSlide;
+      expect(firstCall.timestamp).toBe(0);
+      expect(firstCall.sequenceNumber).toBe(1);
+    });
+
+    it('コールバックなしでも処理が正常に完了すること', async () => {
+      // onSlideDetected を渡さない場合
+      const result = await processor.processVideo(
+        mockVideo,
+        defaultParams,
+        progressCallback
+      );
+
+      expect(result.success).toBe(true);
     });
   });
 });

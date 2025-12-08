@@ -73,7 +73,8 @@ export class VideoProcessor {
   async processVideo(
     video: HTMLVideoElement,
     params: ExtractionParams,
-    onProgress: (state: ProgressState) => void
+    onProgress: (state: ProgressState) => void,
+    onSlideDetected?: (slide: ExtractedSlide) => void
   ): Promise<ProcessingResult> {
     this.cancelled = false;
 
@@ -106,13 +107,15 @@ export class VideoProcessor {
 
       // 最初のフレームを抽出
       const firstFrame = await this.frameExtractor.extractFrame(video, 0);
-      slides.push({
+      const firstSlide: ExtractedSlide = {
         id: this.generateId(),
         sequenceNumber: sequenceNumber++,
         timestamp: 0,
         imageData: firstFrame,
         thumbnailUrl: this.createThumbnailUrl(firstFrame),
-      });
+      };
+      slides.push(firstSlide);
+      onSlideDetected?.(firstSlide);
       previousFrame = firstFrame;
 
       // 進捗更新
@@ -148,13 +151,15 @@ export class VideoProcessor {
 
           if (diff.isDifferent) {
             // スライド切り替えを検出
-            slides.push({
+            const newSlide: ExtractedSlide = {
               id: this.generateId(),
               sequenceNumber: sequenceNumber++,
               timestamp: time,
               imageData: currentFrame,
               thumbnailUrl: this.createThumbnailUrl(currentFrame),
-            });
+            };
+            slides.push(newSlide);
+            onSlideDetected?.(newSlide);
           }
         }
 

@@ -52,6 +52,10 @@ function App() {
     setParams(newParams);
   }, []);
 
+  const handleSlideDetected = useCallback((slide: ExtractedSlide) => {
+    setSlides((prev) => [...prev, slide]);
+  }, []);
+
   const handleStartExtraction = useCallback(async () => {
     if (!video) return;
 
@@ -61,18 +65,19 @@ function App() {
     const processor = new VideoProcessor();
     processorRef.current = processor;
 
-    const result = await processor.processVideo(video, params, setProgress);
+    const result = await processor.processVideo(
+      video,
+      params,
+      setProgress,
+      handleSlideDetected
+    );
 
-    if (result.success) {
-      setSlides(result.slides);
-    } else {
-      if (result.error.type !== 'CANCELLED') {
-        setError(result.error.message);
-      }
+    if (!result.success && result.error.type !== 'CANCELLED') {
+      setError(result.error.message);
     }
 
     processorRef.current = null;
-  }, [video, params]);
+  }, [video, params, handleSlideDetected]);
 
   const handleCancel = useCallback(() => {
     processorRef.current?.cancel();
