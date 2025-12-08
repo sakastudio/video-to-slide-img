@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "MCP_TOOL_TIMEOUT": "1000000",
+    "BASH_DEFAULT_TIMEOUT_MS": "7200000",
+    "BASH_MAX_TIMEOUT_MS": "7200000"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(touch:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(rg:*)",
+      "mcp__moorestec_client__RefreshAssets",
+      "mcp__moorestec_client__GetCompileLogs",
+      "mcp__moorestech_server__RefreshAssets",
+      "mcp__moorestech_server__GetCompileLogs",
+      "mcp__moorestech_server__RunEditModeTests",
+      "mcp__moorestech_server__ClearConsoleLogs",
+      "mcp__unityMCP__compile_and_reload",
+      "mcp__moorestec_client__ClearConsoleLogs",
+      "mcp__moorestec_client__GetCurrentConsoleLogs",
+      "mcp__moorestech_client__RefreshAssets",
+      "mcp__moorestech_client__GetCompileLogs",
+      "mcp__moorestech_client__GetCurrentConsoleLogs",
+      "mcp__moorestech_server__GetCurrentConsoleLogs",
+      "WebFetch(domain:github.com)",
+      "mcp__moorestech_client__ClearConsoleLogs",
+      "Bash(cat:*)",
+      "Bash(gemini:*)",
+      "mcp__moorestech_client__RunPlayModeTests",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__onboarding",
+      "mcp__serena__list_dir",
+      "mcp__serena__find_file",
+      "mcp__serena__write_memory",
+      "mcp__moorestech_client__RunEditModeTests",
+      "Bash(./tools/unity-test.sh:*)",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__find_symbol",
+      "mcp__serena__get_symbols_overview",
+      "mcp__serena__replace_symbol_body",
+      "Bash(dotnet build)",
+      "mcp__serena__insert_after_symbol",
+      "mcp__serena__find_referencing_symbols",
+      "mcp__serena__think_about_collected_information",
+      "SlashCommand(/kiro:spec-requirements:*)",
+      "SlashCommand(/kiro:spec-impl:*)",
+      "Bash(git worktree:*)",
+      "Bash(./tools/unity-list-tests.sh:*)",
+      "Bash(./check_timeout_tests.sh:*)",
+      "Bash(tee:*)",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__read_memory",
+      "SlashCommand(/kiro:spec-tasks:*)",
+      "mcp__serena__list_memories",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nGearChainPoleのチェーン接続表示機能を追加\n\n- GearChainPoleStateDetailにPartnerBlockPositionsを追加\n- クライアント側でLineRendererを使った接続表示用のProcessorを新規作成\n- 重複回避ロジック（座標比較）を実装\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nGearChainPoleのチェーン表示をリファクタリング\n\n- GearChainPoleChainLineViewを新規作成（ライン描画専用）\n- StateChangeProcessorをシンプル化（1メソッド呼び出しのみ）\n- LoadChainLinePrefabAsyncをインナーメソッドに移動\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n)\")"
+    ],
+    "deny": []
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "moorestech_server",
+    "moorestech_client"
+  ],
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Hero.aiff"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "node ./.claude/statusline.js"
+  }
+}
