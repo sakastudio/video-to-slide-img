@@ -1,8 +1,88 @@
-# AI-DLC and Spec-Driven Development
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## プロジェクト概要
+
+動画からスライドを自動検出して画像として抽出するWebアプリケーション。全処理がブラウザ内で完結し、サーバーへのアップロードは行わない。
+
+## コマンド
+
+```bash
+# 開発サーバー起動
+npm run dev
+
+# ビルド
+npm run build
+
+# リント
+npm run lint
+
+# テスト（監視モード）
+npm test
+
+# テスト（単発実行）
+npm run test:run
+
+# 単一テストファイル実行
+npm run test:run src/services/videoProcessor.test.ts
+```
+
+## アーキテクチャ
+
+### ディレクトリ構成
+
+```
+src/
+├── App.tsx           # メインコンポーネント（状態管理の中心）
+├── components/       # UIコンポーネント
+│   ├── VideoInput    # 動画ファイル選択
+│   ├── ParameterPanel # パラメータ設定UI
+│   ├── ProgressIndicator # 進捗表示
+│   └── SlideGallery  # 抽出結果一覧
+├── services/         # ビジネスロジック
+│   ├── videoProcessor.ts     # オーケストレーター
+│   ├── frameExtractor.ts     # Canvas API経由のフレーム抽出
+│   ├── differenceDetector.ts # pixelmatchによる差分検出
+│   └── exportService.ts      # PNG/ZIPエクスポート
+└── types/            # 型定義（ExtractionParams, ExtractedSlide等）
+```
+
+### 処理フロー
+
+1. `VideoInput` で動画ファイルを読み込み
+2. `ParameterPanel` で判定頻度（秒）と閾値（%）を設定
+3. `VideoProcessor.processVideo()` がオーケストレーション
+   - `FrameExtractor` が指定間隔でフレーム抽出
+   - `detectDifference()` で前フレームと比較
+   - 閾値を超えたらスライド切り替えと判定
+4. `SlideGallery` で結果表示、`ExportService` でダウンロード
+
+### 主要な型
+
+```typescript
+ExtractionParams { interval: number, threshold: number }
+ExtractedSlide { id, sequenceNumber, timestamp, imageData, thumbnailUrl }
+ProcessingResult = { success: true, slides } | { success: false, error }
+```
+
+## 技術スタック
+
+- React 19 + TypeScript
+- Vite（開発・ビルド）
+- Vitest + Testing Library（テスト）
+- pixelmatch（差分検出）
+- JSZip（一括エクスポート）
+
+## デプロイ
+
+GitHub Pagesに`/video-to-slide-img/`パスでデプロイ（`vite.config.ts`の`base`設定）
+
+---
+
+## AI-DLC and Spec-Driven Development
 
 Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life Cycle)
-
-## Project Context
 
 ### Paths
 - Steering: `.kiro/steering/`
@@ -17,10 +97,10 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
 - Check `.kiro/specs/` for active specifications
 - Use `/kiro:spec-status [feature-name]` to check progress
 
-## Development Guidelines
-- Think in English, generate responses in Japanese. All Markdown content written to project files (e.g., requirements.md, design.md, tasks.md, research.md, validation reports) MUST be written in the target language configured for this specification (see spec.json.language).
+### Development Guidelines
+- Think in English, generate responses in Japanese. All Markdown content written to project files MUST be written in the target language configured for this specification (see spec.json.language).
 
-## Minimal Workflow
+### Minimal Workflow
 - Phase 0 (optional): `/kiro:steering`, `/kiro:steering-custom`
 - Phase 1 (Specification):
   - `/kiro:spec-init "description"`
@@ -33,13 +113,8 @@ Kiro-style Spec Driven Development implementation on AI-DLC (AI Development Life
   - `/kiro:validate-impl {feature}` (optional: after implementation)
 - Progress check: `/kiro:spec-status {feature}` (use anytime)
 
-## Development Rules
+### Development Rules
 - 3-phase approval workflow: Requirements → Design → Tasks → Implementation
 - Human review required each phase; use `-y` only for intentional fast-track
 - Keep steering current and verify alignment with `/kiro:spec-status`
-- Follow the user's instructions precisely, and within that scope act autonomously: gather the necessary context and complete the requested work end-to-end in this run, asking questions only when essential information is missing or the instructions are critically ambiguous.
-
-## Steering Configuration
-- Load entire `.kiro/steering/` as project memory
-- Default files: `product.md`, `tech.md`, `structure.md`
-- Custom files are supported (managed via `/kiro:steering-custom`)
+- Follow the user's instructions precisely, and within that scope act autonomously
