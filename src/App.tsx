@@ -17,6 +17,7 @@ import './App.css';
 function App() {
   // State
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [params, setParams] = useState<ExtractionParams>(DEFAULT_PARAMS);
   const [progress, setProgress] = useState<ProgressState>({
     status: 'idle',
@@ -32,8 +33,9 @@ function App() {
   const exportServiceRef = useRef(new ExportService());
 
   // Handlers
-  const handleVideoLoad = useCallback((videoElement: HTMLVideoElement) => {
+  const handleVideoLoad = useCallback((videoElement: HTMLVideoElement, file: File) => {
     setVideo(videoElement);
+    setVideoFile(file);
     setError(null);
     setSlides([]);
     setProgress({
@@ -69,7 +71,8 @@ function App() {
       video,
       params,
       setProgress,
-      handleSlideDetected
+      handleSlideDetected,
+      videoFile ?? undefined
     );
 
     if (!result.success && result.error.type !== 'CANCELLED') {
@@ -77,7 +80,7 @@ function App() {
     }
 
     processorRef.current = null;
-  }, [video, params, handleSlideDetected]);
+  }, [video, videoFile, params, handleSlideDetected]);
 
   const handleCancel = useCallback(() => {
     processorRef.current?.cancel();
@@ -98,6 +101,7 @@ function App() {
   const handleReset = useCallback(() => {
     processorRef.current?.cancel();
     setVideo(null);
+    setVideoFile(null);
     setSlides([]);
     setError(null);
     setProgress({

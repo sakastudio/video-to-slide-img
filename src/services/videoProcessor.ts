@@ -1,5 +1,6 @@
 import { FrameExtractor } from './frameExtractor';
 import { detectDifference } from './differenceDetector';
+import { isWebCodecsSupported, WebCodecsProcessor } from './webcodecs';
 import type {
   ExtractionParams,
   ProgressState,
@@ -10,13 +11,28 @@ import type {
 /**
  * 動画処理サービス
  * フレーム抽出と差分検出を組み合わせてスライドを抽出する
+ * WebCodecs対応ブラウザではWorkerベースの高速処理を使用
  */
 export class VideoProcessor {
   private frameExtractor: FrameExtractor;
+  private webCodecsProcessor: WebCodecsProcessor | null = null;
   private cancelled = false;
+  private useWebCodecs: boolean;
 
   constructor() {
     this.frameExtractor = new FrameExtractor();
+    this.useWebCodecs = isWebCodecsSupported();
+  }
+
+  /**
+   * WebCodecsを使用するかどうかを判定
+   */
+  private shouldUseWebCodecs(file?: File): boolean {
+    if (!this.useWebCodecs || !file) {
+      return false;
+    }
+    // MP4形式のみWebCodecs対応
+    return file.type === 'video/mp4';
   }
 
   /**
@@ -69,12 +85,18 @@ export class VideoProcessor {
 
   /**
    * 動画を処理してスライドを抽出する
+   * @param video 動画要素
+   * @param params 抽出パラメータ
+   * @param onProgress 進捗コールバック
+   * @param onSlideDetected スライド検出コールバック
+   * @param file 動画ファイル（WebCodecs使用時に必要）
    */
   async processVideo(
     video: HTMLVideoElement,
     params: ExtractionParams,
     onProgress: (state: ProgressState) => void,
-    onSlideDetected?: (slide: ExtractedSlide) => void
+    onSlideDetected?: (slide: ExtractedSlide) => void,
+    file?: File
   ): Promise<ProcessingResult> {
     this.cancelled = false;
 
@@ -90,6 +112,48 @@ export class VideoProcessor {
       };
     }
 
+    // WebCodecs対応の場合は高速処理を使用
+    if (this.shouldUseWebCodecs(file)) {
+      return this.processWithWebCodecs(file!, video.duration, params, onProgress, onSlideDetected);
+    }
+
+    // フォールバック: Canvas API処理
+    return this.processWithCanvas(video, params, onProgress, onSlideDetected);
+  }
+
+  /**
+   * WebCodecsを使用した高速処理
+   */
+  private async processWithWebCodecs(
+    file: File,
+    duration: number,
+    params: ExtractionParams,
+    onProgress: (state: ProgressState) => void,
+    onSlideDetected?: (slide: ExtractedSlide) => void
+  ): Promise<ProcessingResult> {
+    this.webCodecsProcessor = new WebCodecsProcessor();
+    try {
+      return await this.webCodecsProcessor.processVideo(
+        file,
+        duration,
+        params,
+        onProgress,
+        onSlideDetected
+      );
+    } finally {
+      this.webCodecsProcessor = null;
+    }
+  }
+
+  /**
+   * Canvas APIを使用した従来処理
+   */
+  private async processWithCanvas(
+    video: HTMLVideoElement,
+    params: ExtractionParams,
+    onProgress: (state: ProgressState) => void,
+    onSlideDetected?: (slide: ExtractedSlide) => void
+  ): Promise<ProcessingResult> {
     const { interval, threshold } = params;
     const duration = video.duration;
     const slides: ExtractedSlide[] = [];
@@ -214,5 +278,7 @@ export class VideoProcessor {
    */
   cancel(): void {
     this.cancelled = true;
+    // WebCodecsProcessorのキャンセル
+    this.webCodecsProcessor?.cancel();
   }
 }
