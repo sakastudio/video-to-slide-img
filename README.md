@@ -6,7 +6,7 @@
 
 ## Demo
 
-https://sato-katsumi.github.io/video-to-slide-img/
+https://sakastudio.github.io/video-to-slide-img/
 
 ## Features
 
