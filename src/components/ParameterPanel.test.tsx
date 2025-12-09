@@ -45,6 +45,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('interval-input');
 
         fireEvent.change(input, { target: { value: '2.5' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultParams, interval: 2.5 });
       });
@@ -54,6 +55,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('interval-input');
 
         fireEvent.change(input, { target: { value: '0' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).not.toHaveBeenCalled();
       });
@@ -63,6 +65,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('interval-input');
 
         fireEvent.change(input, { target: { value: '-1' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).not.toHaveBeenCalled();
       });
@@ -72,6 +75,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('interval-input');
 
         fireEvent.change(input, { target: { value: 'abc' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).not.toHaveBeenCalled();
       });
@@ -83,6 +87,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('threshold-input');
 
         fireEvent.change(input, { target: { value: '50' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultParams, threshold: 50 });
       });
@@ -92,6 +97,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('threshold-input');
 
         fireEvent.change(input, { target: { value: '0' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultParams, threshold: 0 });
       });
@@ -101,6 +107,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('threshold-input');
 
         fireEvent.change(input, { target: { value: '100' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).toHaveBeenCalledWith({ ...defaultParams, threshold: 100 });
       });
@@ -110,6 +117,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('threshold-input');
 
         fireEvent.change(input, { target: { value: '101' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).not.toHaveBeenCalled();
       });
@@ -119,6 +127,7 @@ describe('ParameterPanel', () => {
         const input = screen.getByTestId('threshold-input');
 
         fireEvent.change(input, { target: { value: '-5' } });
+        fireEvent.blur(input);
 
         expect(mockOnChange).not.toHaveBeenCalled();
       });
