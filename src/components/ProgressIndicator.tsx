@@ -1,4 +1,5 @@
 import type { ProgressState } from '../types';
+import { useLanguage } from '../i18n';
 
 interface ProgressIndicatorProps {
   state: ProgressState;
@@ -11,6 +12,7 @@ function formatTime(seconds: number): string {
 }
 
 export function ProgressIndicator({ state }: ProgressIndicatorProps) {
+  const { t, language } = useLanguage();
   const { status, currentTime, totalDuration, slidesFound, errorMessage } = state;
 
   if (status === 'idle') {
@@ -19,6 +21,11 @@ export function ProgressIndicator({ state }: ProgressIndicatorProps) {
 
   const progressPercent =
     totalDuration > 0 ? Math.round((currentTime / totalDuration) * 100) : 0;
+
+  const slidesCountText =
+    language === 'ja'
+      ? `${t('detectedSlides')}: ${slidesFound}${t('slides')}`
+      : `${t('detectedSlides')}: ${slidesFound}`;
 
   return (
     <div className="progress-indicator" data-testid="progress-indicator">
@@ -37,20 +44,22 @@ export function ProgressIndicator({ state }: ProgressIndicatorProps) {
             </span>
             <span className="progress-percent">{progressPercent}%</span>
           </div>
-          <p className="slides-count">検出されたスライド: {slidesFound}枚</p>
+          <p className="slides-count">{slidesCountText}</p>
         </>
       )}
 
       {status === 'completed' && (
         <div className="progress-completed">
-          <p className="completed-message">抽出完了</p>
-          <p className="slides-count">検出されたスライド: {slidesFound}枚</p>
+          <p className="completed-message">{t('extractionComplete')}</p>
+          <p className="slides-count">{slidesCountText}</p>
         </div>
       )}
 
       {status === 'error' && (
         <div className="progress-error">
-          <p className="error-message">エラー: {errorMessage}</p>
+          <p className="error-message">
+            {t('error')}: {errorMessage}
+          </p>
         </div>
       )}
     </div>

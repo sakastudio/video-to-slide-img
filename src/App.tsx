@@ -3,9 +3,11 @@ import { VideoInput } from './components/VideoInput';
 import { ParameterPanel } from './components/ParameterPanel';
 import { ProgressIndicator } from './components/ProgressIndicator';
 import { SlideGallery } from './components/SlideGallery';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { VideoProcessorOptimized } from './services/videoProcessorOptimized';
 import { VideoProcessor } from './services/videoProcessor';
 import { ExportService } from './services/exportService';
+import { useLanguage } from './i18n';
 import {
   DEFAULT_PARAMS,
   type ExtractionParams,
@@ -16,6 +18,8 @@ import {
 import './App.css';
 
 function App() {
+  const { t } = useLanguage();
+
   // State
   const [video, setVideo] = useState<HTMLVideoElement | null>(null);
   const [params, setParams] = useState<ExtractionParams>(DEFAULT_PARAMS);
@@ -150,16 +154,16 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>動画スライド抽出ツール</h1>
-        <p className="app-description">
-          動画からスライドを自動検出して画像として保存できます。
-          すべての処理はブラウザ内で完結し、サーバーへのアップロードは行いません。
-        </p>
+        <div className="header-top">
+          <h1>{t('appTitle')}</h1>
+          <LanguageSwitcher />
+        </div>
+        <p className="app-description">{t('appDescription')}</p>
       </header>
 
       <main className="app-main">
         <section className="input-section">
-          <h2>1. 動画を選択</h2>
+          <h2>{t('step1')}</h2>
           <VideoInput
             onVideoLoad={handleVideoLoad}
             onError={handleVideoError}
@@ -169,7 +173,7 @@ function App() {
 
         {video && (
           <section className="params-section">
-            <h2>2. パラメータを設定</h2>
+            <h2>{t('step2')}</h2>
             <ParameterPanel
               params={params}
               onChange={handleParamsChange}
@@ -180,7 +184,7 @@ function App() {
 
         {video && (
           <section className="action-section">
-            <h2>3. 抽出を実行</h2>
+            <h2>{t('step3')}</h2>
             <div className="action-buttons">
               {!isProcessing ? (
                 <button
@@ -189,7 +193,7 @@ function App() {
                   disabled={!canStartExtraction}
                   className="start-button"
                 >
-                  スライド抽出を開始
+                  {t('startExtraction')}
                 </button>
               ) : (
                 <button
@@ -197,7 +201,7 @@ function App() {
                   onClick={handleCancel}
                   className="cancel-button"
                 >
-                  キャンセル
+                  {t('cancel')}
                 </button>
               )}
               <button
@@ -206,7 +210,7 @@ function App() {
                 disabled={isProcessing}
                 className="reset-button"
               >
-                リセット
+                {t('reset')}
               </button>
             </div>
           </section>
@@ -222,7 +226,7 @@ function App() {
 
         {slides.length > 0 && (
           <section className="gallery-section">
-            <h2>4. スライドをダウンロード</h2>
+            <h2>{t('step4')}</h2>
             <SlideGallery
               slides={slides}
               onDownloadSingle={handleDownloadSingle}
@@ -233,7 +237,7 @@ function App() {
       </main>
 
       <footer className="app-footer">
-        <p>対応形式: MP4, WebM, OGG</p>
+        <p>{t('supportedFormats')}</p>
       </footer>
     </div>
   );

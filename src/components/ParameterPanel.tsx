@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect } from 'react';
 import { DEFAULT_PARAMS, type ExtractionParams } from '../types';
+import { useLanguage } from '../i18n';
 
 interface ParameterPanelProps {
   params: ExtractionParams;
@@ -8,6 +9,7 @@ interface ParameterPanelProps {
 }
 
 export function ParameterPanel({ params, onChange, disabled = false }: ParameterPanelProps) {
+  const { t } = useLanguage();
   const [intervalInput, setIntervalInput] = useState(String(params.interval));
   const [thresholdInput, setThresholdInput] = useState(String(params.threshold));
 
@@ -57,12 +59,14 @@ export function ParameterPanel({ params, onChange, disabled = false }: Parameter
 
   return (
     <div className="parameter-panel">
-      <h3>抽出パラメータ</h3>
+      <h3>{t('extractionParams')}</h3>
 
       <div className="parameter-field">
         <label htmlFor="interval">
-          サンプリング間隔（秒）
-          <span className="default-hint">デフォルト: {DEFAULT_PARAMS.interval}秒</span>
+          {t('samplingInterval')}
+          <span className="default-hint">
+            {t('default')}: {DEFAULT_PARAMS.interval}s
+          </span>
         </label>
         <input
           id="interval"
@@ -79,8 +83,10 @@ export function ParameterPanel({ params, onChange, disabled = false }: Parameter
 
       <div className="parameter-field">
         <label htmlFor="threshold">
-          差分閾値（%）
-          <span className="default-hint">デフォルト: {DEFAULT_PARAMS.threshold}%</span>
+          {t('diffThreshold')}
+          <span className="default-hint">
+            {t('default')}: {DEFAULT_PARAMS.threshold}%
+          </span>
         </label>
         <input
           id="threshold"
@@ -102,7 +108,7 @@ export function ParameterPanel({ params, onChange, disabled = false }: Parameter
         disabled={disabled}
         className="reset-button"
       >
-        デフォルトに戻す
+        {t('resetToDefault')}
       </button>
     </div>
   );

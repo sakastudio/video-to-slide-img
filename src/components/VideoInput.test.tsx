@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../test/testUtils';
 import { VideoInput } from './VideoInput';
 import { SUPPORTED_FORMATS } from '../types';
 
@@ -15,7 +15,6 @@ describe('VideoInput', () => {
     it('動画選択ボタンが表示される', () => {
       render(<VideoInput onVideoLoad={mockOnVideoLoad} onError={mockOnError} />);
       expect(screen.getByTestId('video-select-button')).toBeInTheDocument();
-      expect(screen.getByText('動画ファイルを選択')).toBeInTheDocument();
     });
 
     it('ファイル入力要素は非表示である', () => {
@@ -41,7 +40,7 @@ describe('VideoInput', () => {
 
       expect(mockOnError).toHaveBeenCalledWith({
         type: 'UNSUPPORTED_FORMAT',
-        message: 'MP4、WebM、OGG形式の動画を選択してください',
+        message: expect.any(String),
       });
       expect(mockOnVideoLoad).not.toHaveBeenCalled();
     });

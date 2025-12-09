@@ -1,5 +1,6 @@
 import { useCallback, useState, useMemo } from 'react';
 import type { ExtractedSlide } from '../types';
+import { useLanguage } from '../i18n';
 
 interface SlideGalleryProps {
   slides: ExtractedSlide[];
@@ -18,6 +19,7 @@ export function SlideGallery({
   onDownloadSingle,
   onDownloadSelected,
 }: SlideGalleryProps) {
+  const { t } = useLanguage();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const handleDownloadSingle = useCallback(
@@ -66,7 +68,7 @@ export function SlideGallery({
   return (
     <div className="slide-gallery" data-testid="slide-gallery">
       <div className="gallery-header">
-        <h3>検出されたスライド ({slides.length}枚)</h3>
+        <h3>{t('detectedSlidesCount', { count: slides.length })}</h3>
         <div className="gallery-actions">
           <button
             type="button"
@@ -74,7 +76,7 @@ export function SlideGallery({
             className="select-toggle-button"
             data-testid="select-toggle-button"
           >
-            {isAllSelected ? '全解除' : '全選択'}
+            {isAllSelected ? t('deselectAll') : t('selectAll')}
           </button>
           <button
             type="button"
@@ -83,7 +85,7 @@ export function SlideGallery({
             data-testid="download-selected-button"
             disabled={!hasSelection}
           >
-            選択をダウンロード ({selectedIds.size}枚)
+            {t('downloadSelected', { count: selectedIds.size })}
           </button>
         </div>
       </div>
@@ -107,7 +109,7 @@ export function SlideGallery({
                 />
                 <img
                   src={slide.thumbnailUrl}
-                  alt={`スライド ${slide.sequenceNumber}`}
+                  alt={t('slideAlt', { number: slide.sequenceNumber })}
                   className="slide-thumbnail"
                 />
               </label>
@@ -121,7 +123,7 @@ export function SlideGallery({
                 className="download-single-button"
                 data-testid={`download-slide-${slide.sequenceNumber}`}
               >
-                ダウンロード
+                {t('download')}
               </button>
             </div>
           );

@@ -1,5 +1,6 @@
 import { useRef, useCallback, useState, useEffect } from 'react';
 import { SUPPORTED_FORMATS, type VideoLoadError } from '../types';
+import { useLanguage } from '../i18n';
 
 interface VideoInputProps {
   onVideoLoad: (video: HTMLVideoElement, file: File) => void;
@@ -8,6 +9,7 @@ interface VideoInputProps {
 }
 
 export function VideoInput({ onVideoLoad, onError, disabled = false }: VideoInputProps) {
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -19,13 +21,13 @@ export function VideoInput({ onVideoLoad, onError, disabled = false }: VideoInpu
       if (!SUPPORTED_FORMATS.includes(file.type as (typeof SUPPORTED_FORMATS)[number])) {
         onError({
           type: 'UNSUPPORTED_FORMAT',
-          message: 'MP4、WebM、OGG形式の動画を選択してください',
+          message: t('unsupportedFormat'),
         });
         return false;
       }
       return true;
     },
-    [onError]
+    [onError, t]
   );
 
   // previewUrlが設定された後、video要素がDOMに追加されてからソースを設定
@@ -44,12 +46,12 @@ export function VideoInput({ onVideoLoad, onError, disabled = false }: VideoInpu
     video.onerror = () => {
       onError({
         type: 'LOAD_FAILED',
-        message: '動画の読み込みに失敗しました',
+        message: t('loadFailed'),
       });
     };
 
     setPendingFile(null);
-  }, [previewUrl, pendingFile, onVideoLoad, onError]);
+  }, [previewUrl, pendingFile, onVideoLoad, onError, t]);
 
   const handleFileChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,7 +97,7 @@ export function VideoInput({ onVideoLoad, onError, disabled = false }: VideoInpu
           className="video-select-button"
           data-testid="video-select-button"
         >
-          動画ファイルを選択
+          {t('selectVideo')}
         </button>
       ) : (
         <div className="video-preview-container">
@@ -112,7 +114,7 @@ export function VideoInput({ onVideoLoad, onError, disabled = false }: VideoInpu
             disabled={disabled}
             className="video-change-button"
           >
-            別の動画を選択
+            {t('selectAnotherVideo')}
           </button>
         </div>
       )}

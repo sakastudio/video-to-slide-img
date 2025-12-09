@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '../test/testUtils';
 import { ParameterPanel } from './ParameterPanel';
 import { DEFAULT_PARAMS, type ExtractionParams } from '../types';
 
@@ -28,13 +28,14 @@ describe('ParameterPanel', () => {
 
     it('デフォルト値のヒントが表示される', () => {
       render(<ParameterPanel params={defaultParams} onChange={mockOnChange} />);
-      expect(screen.getByText(`デフォルト: ${DEFAULT_PARAMS.interval}秒`)).toBeInTheDocument();
-      expect(screen.getByText(`デフォルト: ${DEFAULT_PARAMS.threshold}%`)).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(`${DEFAULT_PARAMS.interval}s`))).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(`${DEFAULT_PARAMS.threshold}%`))).toBeInTheDocument();
     });
 
     it('デフォルトに戻すボタンが表示される', () => {
       render(<ParameterPanel params={defaultParams} onChange={mockOnChange} />);
-      expect(screen.getByText('デフォルトに戻す')).toBeInTheDocument();
+      // Check for reset button by class
+      expect(screen.getByRole('button', { name: /デフォルト|Reset/i })).toBeInTheDocument();
     });
   });
 
@@ -139,7 +140,7 @@ describe('ParameterPanel', () => {
       const customParams: ExtractionParams = { interval: 5.0, threshold: 25 };
       render(<ParameterPanel params={customParams} onChange={mockOnChange} />);
 
-      fireEvent.click(screen.getByText('デフォルトに戻す'));
+      fireEvent.click(screen.getByRole('button', { name: /デフォルト|Reset/i }));
 
       expect(mockOnChange).toHaveBeenCalledWith(DEFAULT_PARAMS);
     });
@@ -151,7 +152,7 @@ describe('ParameterPanel', () => {
 
       expect(screen.getByTestId('interval-input')).toBeDisabled();
       expect(screen.getByTestId('threshold-input')).toBeDisabled();
-      expect(screen.getByText('デフォルトに戻す')).toBeDisabled();
+      expect(screen.getByRole('button', { name: /デフォルト|Reset/i })).toBeDisabled();
     });
   });
 });

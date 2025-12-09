@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Video icon background -->
+  <rect x="10" y="20" width="80" height="55" rx="8" fill="url(#grad)"/>
+  <!-- Play button -->
+  <polygon points="40,35 40,60 60,47.5" fill="white"/>
+  <!-- Slide cards -->
+  <rect x="55" y="58" width="18" height="14" rx="2" fill="#fff" opacity="0.9"/>
+  <rect x="62" y="65" width="18" height="14" rx="2" fill="#fff" opacity="0.95"/>
+  <rect x="69" y="72" width="18" height="14" rx="2" fill="#fff"/>
+</svg>

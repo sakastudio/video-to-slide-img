@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sakastudio.github.io/video-to-slide-img/sitemap.xml
