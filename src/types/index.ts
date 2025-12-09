@@ -12,8 +12,8 @@ export interface ExtractionParams {
  * デフォルトパラメータ
  */
 export const DEFAULT_PARAMS: ExtractionParams = {
-  interval: 1.0,
-  threshold: 10,
+  interval: 3.0,
+  threshold: 15,
 };
 
 /**

@@ -1,5 +1,18 @@
 export type Language = 'ja' | 'en';
 
+export const seoMeta = {
+  ja: {
+    title: 'Video to Slide - 動画からスライドを自動抽出',
+    description:
+      '動画からスライドを自動検出して画像として保存。ブラウザ内で完結、サーバーアップロード不要。プレゼン動画、講義動画からスライド画像を簡単抽出。',
+  },
+  en: {
+    title: 'Video to Slide - Extract Slides from Video Automatically',
+    description:
+      'Free online tool to extract slides from video automatically. No upload required, all processing in browser. Extract presentation slides with ease.',
+  },
+} as const;
+
 export const translations = {
   ja: {
     // App

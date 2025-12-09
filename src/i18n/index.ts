@@ -1,2 +1,2 @@
 export { LanguageProvider, useLanguage } from './LanguageContext';
-export { translations, type Language, type TranslationKey } from './translations';
+export { translations, seoMeta, type Language, type TranslationKey } from './translations';

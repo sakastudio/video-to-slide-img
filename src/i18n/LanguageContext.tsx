@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { translations, type Language, type TranslationKey } from './translations';
+import { translations, seoMeta, type Language, type TranslationKey } from './translations';
 
 interface LanguageContextType {
   language: Language;
@@ -59,9 +59,29 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     [language]
   );
 
-  // Set initial language on document
+  // Update document language and meta tags
   useEffect(() => {
     document.documentElement.lang = language;
+
+    // Update title
+    document.title = seoMeta[language].title;
+
+    // Update meta description
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription) {
+      metaDescription.setAttribute('content', seoMeta[language].description);
+    }
+
+    // Update OG tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) {
+      ogTitle.setAttribute('content', seoMeta[language].title);
+    }
+
+    const ogDescription = document.querySelector('meta[property="og:description"]');
+    if (ogDescription) {
+      ogDescription.setAttribute('content', seoMeta[language].description);
+    }
   }, [language]);
 
   return (
