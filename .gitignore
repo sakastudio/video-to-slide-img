@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Rust / Wasm build artifacts
+wasm-diff-detector/target/
+wasm-diff-detector/pkg/
+
+# Test videos
+public/*.mp4
+
+# Local settings
+.claude/settings.local.json
+.kiro/plans/

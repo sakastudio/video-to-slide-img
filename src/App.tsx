@@ -3,6 +3,7 @@ import { VideoInput } from './components/VideoInput';
 import { ParameterPanel } from './components/ParameterPanel';
 import { ProgressIndicator } from './components/ProgressIndicator';
 import { SlideGallery } from './components/SlideGallery';
+import { VideoProcessorOptimized } from './services/videoProcessorOptimized';
 import { VideoProcessor } from './services/videoProcessor';
 import { ExportService } from './services/exportService';
 import {
@@ -28,7 +29,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Refs
-  const processorRef = useRef<VideoProcessor | null>(null);
+  const processorRef = useRef<VideoProcessorOptimized | VideoProcessor | null>(null);
   const exportServiceRef = useRef(new ExportService());
 
   // Handlers
@@ -62,7 +63,18 @@ function App() {
     setError(null);
     setSlides([]);
 
-    const processor = new VideoProcessor();
+    // 最適化版を試し、失敗したら通常版にフォールバック
+    let processor: VideoProcessorOptimized | VideoProcessor;
+    let useOptimized = true;
+
+    try {
+      processor = new VideoProcessorOptimized();
+    } catch {
+      console.warn('Optimized processor not available, using fallback');
+      processor = new VideoProcessor();
+      useOptimized = false;
+    }
+
     processorRef.current = processor;
 
     const result = await processor.processVideo(
@@ -72,10 +84,34 @@ function App() {
       handleSlideDetected
     );
 
-    if (!result.success && result.error.type !== 'CANCELLED') {
+    // 最適化版でWorker/Wasmエラーが発生した場合、通常版で再試行
+    if (!result.success && result.error.type === 'EXTRACTION_FAILED' && useOptimized) {
+      console.warn('Optimized processing failed, retrying with fallback');
+      if ('dispose' in processor) {
+        processor.dispose();
+      }
+
+      const fallbackProcessor = new VideoProcessor();
+      processorRef.current = fallbackProcessor;
+
+      const fallbackResult = await fallbackProcessor.processVideo(
+        video,
+        params,
+        setProgress,
+        handleSlideDetected
+      );
+
+      if (!fallbackResult.success && fallbackResult.error.type !== 'CANCELLED') {
+        setError(fallbackResult.error.message);
+      }
+    } else if (!result.success && result.error.type !== 'CANCELLED') {
       setError(result.error.message);
     }
 
+    // クリーンアップ
+    if (processorRef.current && 'dispose' in processorRef.current) {
+      processorRef.current.dispose();
+    }
     processorRef.current = null;
   }, [video, params, handleSlideDetected]);
 
