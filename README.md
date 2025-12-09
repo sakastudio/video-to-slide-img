@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+# Video to Slide Image
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+動画からスライドを自動検出し、画像として抽出するWebアプリケーション。
 
-Currently, two official plugins are available:
+**全処理がブラウザ内で完結** - サーバーへのアップロードは一切行わず、プライバシーを完全に保護します。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Demo
 
-## React Compiler
+https://sato-katsumi.github.io/video-to-slide-img/
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- 動画ファイルからスライド切り替えを自動検出
+- 検出間隔・感度の調整が可能
+- 個別PNG / 一括ZIPダウンロード
+- オフライン完全対応（サーバー通信なし）
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Usage
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. 動画ファイルをドラッグ＆ドロップまたは選択
+2. 必要に応じてパラメータを調整
+   - **判定頻度**: フレームをチェックする間隔（秒）
+   - **閾値**: スライド切り替えと判定する差分の割合（%）
+3. 「抽出開始」をクリック
+4. 検出されたスライドを確認し、ダウンロード
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Tech Stack
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React 19 + TypeScript
+- Vite
+- pixelmatch（フレーム差分検出）
+- JSZip（一括エクスポート）
+- Rust + WebAssembly（高速フレーム処理）
+
+## Development
+
+```bash
+# 依存関係のインストール
+npm install
+
+# 開発サーバー起動
+npm run dev
+
+# ビルド
+npm run build
+
+# テスト
+npm run test:run
+
+# リント
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Architecture
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+├── App.tsx              # メインコンポーネント
+├── components/          # UIコンポーネント
+│   ├── VideoInput       # 動画ファイル選択
+│   ├── ParameterPanel   # パラメータ設定
+│   ├── ProgressIndicator # 進捗表示
+│   └── SlideGallery     # 抽出結果一覧
+├── services/            # ビジネスロジック
+│   ├── videoProcessor   # 処理オーケストレーター
+│   ├── frameExtractor   # フレーム抽出
+│   ├── differenceDetector # 差分検出
+│   └── exportService    # エクスポート
+└── types/               # 型定義
+```
+
+## License
+
+MIT
